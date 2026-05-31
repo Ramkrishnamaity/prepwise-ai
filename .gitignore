@@ -1,0 +1,33 @@
+# ──────────────────────────────────────────
+# Frontend (Next.js / Node)
+# ──────────────────────────────────────────
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/node_modules/
+frontend/.env*
+
+# ──────────────────────────────────────────
+# Backend (Node.js / Express)
+# ──────────────────────────────────────────
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/public/
+backend/logs/
+chroma_data/
+
+# ──────────────────────────────────────────
+# Docker
+# ──────────────────────────────────────────
+docker-compose.override.yml
+
+# ──────────────────────────────────────────
+# OS / editors
+# ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
