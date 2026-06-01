@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
+import Navbar from '@/components/home/Navbar'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
     const { isLoggedIn, authInitialized } = useSelector((state: RootState) => state.user)
@@ -25,5 +26,12 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
         )
     }
 
-    return <>{children}</>
+    return (
+        <>
+            <Navbar />
+            <main className="pt-16 min-h-screen bg-background">
+                {children}
+            </main>
+        </>
+    )
 }

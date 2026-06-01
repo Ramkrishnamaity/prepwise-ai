@@ -1,7 +1,7 @@
 export default function DashboardPage() {
-  return (
-    <div>
-      <h1>Dashboard Page</h1>
-    </div>
-  );
+    return (
+        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+            <h1 className="text-2xl font-semibold text-text-primary">Dashboard</h1>
+        </div>
+    )
 }
