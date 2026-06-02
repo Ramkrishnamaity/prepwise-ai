@@ -9,6 +9,11 @@ interface ResumeUploaderProps {
   onFileRemove: () => void
 }
 
+const ACCEPTED_TYPES = new Set([
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+])
+
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
@@ -21,8 +26,8 @@ export function ResumeUploader({ file, onFileSelect, onFileRemove }: ResumeUploa
 
   const handleFile = useCallback((f: File) => {
     setError(null)
-    if (f.type !== 'application/pdf') {
-      setError('Only PDF files are supported.')
+    if (!ACCEPTED_TYPES.has(f.type)) {
+      setError('Only PDF and DOCX files are supported.')
       return
     }
     onFileSelect(f)
@@ -62,12 +67,12 @@ export function ResumeUploader({ file, onFileSelect, onFileRemove }: ResumeUploa
           </div>
           <div className="text-center">
             <p className="text-lg font-semibold text-text-primary">Drop your resume here</p>
-            <p className="text-sm text-text-muted mt-1">or click to browse · PDF only · Max 10 MB</p>
+            <p className="text-sm text-text-muted mt-1">or click to browse · PDF or DOCX · Max 10 MB</p>
           </div>
           <input
             ref={inputRef}
             type="file"
-            accept="application/pdf"
+            accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             className="hidden"
             onChange={onInputChange}
           />

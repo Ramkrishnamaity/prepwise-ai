@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { ArrowRight, Loader2, FileText, ChevronRight, Mic } from 'lucide-react'
 import { Pagination } from '@/components/ui/Pagination'
 import { ResumeUploader } from '@/components/dashboard/ResumeUploader'
-import { PDFPreview } from '@/components/dashboard/PDFPreview'
+import { ResumePreview } from '@/components/dashboard/ResumePreview'
 import { ScorePanel } from '@/components/dashboard/ScorePanel'
 import type { ResumeAnalysis } from '@/types/resume'
 
@@ -244,9 +244,9 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {stage === 'results' && analysisError && previewUrl && (
+            {stage === 'results' && analysisError && previewUrl && file && (
               <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-10 gap-8">
-                <PDFPreview url={previewUrl} />
+                <ResumePreview file={file} url={previewUrl} />
                 <div className="flex flex-col items-center justify-center gap-4 text-center p-6 rounded-2xl border border-error/20 bg-error/5">
                   <div className="w-14 h-14 rounded-2xl bg-error/10 flex items-center justify-center text-2xl">⚠️</div>
                   <p className="font-semibold text-text-primary">Couldn't Analyze Resume</p>
@@ -254,10 +254,20 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
-            {stage === 'results' && analysis && previewUrl && (
+            {stage === 'results' && analysis && previewUrl && file && (
               <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-10 gap-8">
-                <PDFPreview url={previewUrl} />
-                <ScorePanel analysis={analysis} />
+                <ResumePreview file={file} url={previewUrl} />
+                <ScorePanel
+                  analysis={analysis}
+                  onAnalyzeAnother={() => {
+                    if (previewUrl) URL.revokeObjectURL(previewUrl)
+                    setFile(null)
+                    setPreviewUrl(null)
+                    setAnalysis(null)
+                    setAnalysisError(null)
+                    setStage('upload')
+                  }}
+                />
               </div>
             )}
           </>

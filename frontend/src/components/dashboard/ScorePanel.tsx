@@ -8,7 +8,8 @@ import type { ResumeAnalysis } from '@/types/resume'
 const MAX_VISIBLE = 3
 
 interface ScorePanelProps {
-  analysis: ResumeAnalysis
+  analysis:         ResumeAnalysis
+  onAnalyzeAnother: () => void
 }
 
 function getScoreColor(score: number): string {
@@ -50,7 +51,7 @@ function ItemList({ items, dotColor, onViewAll }: ItemListProps) {
 }
 
 
-export function ScorePanel({ analysis }: ScorePanelProps) {
+export function ScorePanel({ analysis, onAnalyzeAnother }: ScorePanelProps) {
   const { ats_score, strengths, improvements } = analysis
   const color = getScoreColor(ats_score)
   const [modal, setModal] = useState<'strengths' | 'improvements' | null>(null)
@@ -105,10 +106,18 @@ export function ScorePanel({ analysis }: ScorePanelProps) {
         </div>
 
         {/* CTA */}
-        <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-primary-fg bg-primary hover:bg-primary-hover transition-colors">
-          Start Interview
-          <ArrowRight className="w-5 h-5" />
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={onAnalyzeAnother}
+            className="flex-1 py-3 rounded-xl font-semibold text-text-secondary border border-border hover:border-border-strong hover:text-text-primary transition-colors"
+          >
+            Analyze Another
+          </button>
+          <button className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-primary-fg bg-primary hover:bg-primary-hover transition-colors">
+            Start Interview
+            <ArrowRight className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Modals */}
