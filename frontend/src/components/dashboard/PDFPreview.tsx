@@ -89,8 +89,8 @@ export function PDFPreview({ url }: PDFPreviewProps) {
       {/* Viewer */}
       <div
         ref={containerRef}
-        className="relative overflow-auto flex justify-center p-6 bg-[#111113]"
-        style={{ maxHeight: '72vh' }}
+        className="relative overflow-auto flex justify-center p-4 bg-[#111113]"
+        style={{ maxHeight: '67vh' }}
       >
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center">
