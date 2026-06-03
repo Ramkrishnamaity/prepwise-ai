@@ -9,35 +9,64 @@ interface DOCXPreviewProps {
 }
 
 export function DOCXPreview({ file }: DOCXPreviewProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const styleRef     = useRef<HTMLDivElement>(null)
+  const outerRef   = useRef<HTMLDivElement>(null) // scroll + width source
+  const shimRef    = useRef<HTMLDivElement>(null) // height shim for scaled content
+  const contentRef = useRef<HTMLDivElement>(null) // gets transform: scale
+  const styleRef   = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState(false)
 
+  function applyScale() {
+    const outer   = outerRef.current
+    const shim    = shimRef.current
+    const content = contentRef.current
+    if (!outer || !shim || !content) return
+
+    const naturalW = content.scrollWidth
+    const naturalH = content.scrollHeight
+    if (!naturalW || !naturalH) return
+
+    const scale = outer.clientWidth / naturalW
+    content.style.transform       = `scale(${scale})`
+    content.style.transformOrigin = 'top left'
+    shim.style.height             = `${naturalH * scale}px`
+  }
+
   useEffect(() => {
-    if (!containerRef.current || !styleRef.current) return
+    const content = contentRef.current
+    const style   = styleRef.current
+    if (!content || !style) return
+
     setLoading(true)
     setError(false)
+    content.innerHTML      = ''
+    content.style.transform = ''
+    if (shimRef.current) shimRef.current.style.height = ''
 
-    const el = containerRef.current
-    el.innerHTML = ''
-
-    renderAsync(file, el, styleRef.current, {
-      className: 'docx-preview-root',
-      inWrapper: false,
-      ignoreWidth: true,
-      ignoreHeight: true,
-      ignoreFonts: false,
-      breakPages: true,
+    renderAsync(file, content, style, {
+      inWrapper:    false,
+      ignoreWidth:  false,
+      ignoreHeight: false,
+      breakPages:   true,
       useBase64URL: true,
     })
-      .then(() => setLoading(false))
+      .then(() => {
+        requestAnimationFrame(applyScale)
+        setLoading(false)
+      })
       .catch(() => { setLoading(false); setError(true) })
   }, [file])
 
+  useEffect(() => {
+    const outer = outerRef.current
+    if (!outer) return
+    const ro = new ResizeObserver(applyScale)
+    ro.observe(outer)
+    return () => ro.disconnect()
+  }, [])
+
   return (
     <div className="rounded-2xl border border-border overflow-hidden">
-      {/* style mount point — invisible, needed by docx-preview */}
       <div ref={styleRef} className="hidden" />
 
       {/* Toolbar */}
@@ -45,10 +74,14 @@ export function DOCXPreview({ file }: DOCXPreviewProps) {
         <span className="text-xs font-medium text-text-secondary">{file.name}</span>
       </div>
 
-      {/* Viewer — light background so white DOCX pages render naturally */}
-      <div className="relative overflow-auto bg-[#e8e8e8] p-4" style={{ maxHeight: '67vh' }}>
+      {/* Scroll container — clips natural-width content, scrolls vertically */}
+      <div
+        ref={outerRef}
+        className="relative overflow-y-auto overflow-x-hidden bg-[#e8e8e8]"
+        style={{ maxHeight: '68vh' }}
+      >
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-[#e8e8e8] z-10">
             <Loader2 className="w-6 h-6 text-primary animate-spin" />
           </div>
         )}
@@ -57,10 +90,12 @@ export function DOCXPreview({ file }: DOCXPreviewProps) {
             Could not render this document.
           </p>
         )}
-        <div
-          ref={containerRef}
-          className="docx-wrapper"
-        />
+
+        {/* shimRef holds the correct scrollable height after scaling */}
+        <div ref={shimRef} className="relative">
+          {/* contentRef renders at natural doc width, then scaled down to fit */}
+          <div ref={contentRef} className="absolute top-0 left-0" />
+        </div>
       </div>
     </div>
   )
