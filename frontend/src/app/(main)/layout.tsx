@@ -11,7 +11,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     useEffect(() => {
         if (!authInitialized) return
         if (!isLoggedIn) {
-            window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`
+            window.location.href = '/'
         }
     }, [authInitialized, isLoggedIn])
 

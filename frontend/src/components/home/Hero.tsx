@@ -67,10 +67,8 @@ export default function Hero() {
             </p>
 
             {/* CTA */}
-            <div className="relative flex mt-8">
-                {!authInitialized ? (
-                    <div className="h-11 w-52 rounded-lg bg-surface animate-pulse" />
-                ) : isLoggedIn ? (
+            <div className="relative flex mt-8 min-h-[44px]">
+                {!authInitialized ? null : isLoggedIn ? (
                     <Link
                         href="/dashboard"
                         className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary-hover text-primary-fg text-sm font-medium transition-all shadow-lg"
@@ -79,7 +77,8 @@ export default function Hero() {
                         Get Started
                         <ArrowRight className="w-4 h-4" />
                     </Link>
-                ) : (
+                ) : null}
+                {authInitialized && !isLoggedIn && (
                     <a
                         href={`${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
                         onClick={() => setSigningIn(true)}
