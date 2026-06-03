@@ -292,7 +292,7 @@ export default function DashboardPage() {
                   key={record.id}
                   className="flex items-center gap-4 p-4 rounded-2xl border border-border bg-surface hover:bg-surface-raised transition-all group cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-surface-raised flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-surface-raised flex items-center justify-center shrink-0">
                     <FileText className="w-5 h-5 text-primary" />
                   </div>
 
@@ -300,12 +300,12 @@ export default function DashboardPage() {
                     {/* Top row: filename + date */}
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <p className="text-sm font-medium text-text-primary truncate">{record.filename}</p>
-                      <span className="text-xs text-text-muted flex-shrink-0">{record.date}</span>
+                      <span className="text-xs text-text-muted shrink-0">{record.date}</span>
                     </div>
 
                     {/* ATS score bar */}
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-xs font-semibold flex-shrink-0" style={{ color: getScoreColor(record.ats_score) }}>
+                      <span className="text-xs font-semibold shrink-0" style={{ color: getScoreColor(record.ats_score) }}>
                         ATS {record.ats_score}/100
                       </span>
                       <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
@@ -331,7 +331,7 @@ export default function DashboardPage() {
                     )}
                   </div>
 
-                  <ChevronRight className="w-4 h-4 text-text-muted group-hover:text-text-primary transition-colors flex-shrink-0" />
+                  <ChevronRight className="w-4 h-4 text-text-muted group-hover:text-text-primary transition-colors shrink-0" />
                 </div>
               ))}
               </>
