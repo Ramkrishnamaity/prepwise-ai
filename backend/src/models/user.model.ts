@@ -1,14 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
+import { IUser } from '@/utils/types/model.types'
 
-export interface IUser extends Document {
-    google_id:  string
-    email:      string
-    name:       string
-    picture?:   string
-    is_active:  boolean
-    created_at: Date
-    updated_at: Date
-}
+export type { IUser }
 
 const UserSchema = new Schema<IUser>(
     {

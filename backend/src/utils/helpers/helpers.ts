@@ -50,6 +50,16 @@ const buildToken = (user: any): string => {
     )
 }
 
-const helpers = { getDate, getTime, getDateTime, logError, buildToken }
+// ─── Text ─────────────────────────────────────────────────────────────────────
+
+export const cleanResumeText = (text: string): string =>
+    text
+        .replace(/\r\n/g, '\n')
+        .replace(/\t/g, ' ')
+        .replace(/[ ]{2,}/g, ' ')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim()
+
+const helpers = { getDate, getTime, getDateTime, logError, buildToken, cleanResumeText }
 
 export default helpers

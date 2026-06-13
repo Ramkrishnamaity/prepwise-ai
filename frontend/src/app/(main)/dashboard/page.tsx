@@ -7,6 +7,7 @@ import { ResumeUploader } from '@/components/dashboard/ResumeUploader'
 import { ResumePreview } from '@/components/dashboard/ResumePreview'
 import { ScorePanel } from '@/components/dashboard/ScorePanel'
 import type { ResumeAnalysis } from '@/types/resume'
+import resumeApi from '@/services/api/resume.api'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -20,72 +21,6 @@ interface AnalysisRecord {
   date: string
   interview: { status: string; score: number } | null
 }
-
-// ─── Mock data ────────────────────────────────────────────────────────────────
-// Switch ACTIVE_MOCK to test different UI states:
-//   MOCK_VALID          → full data (score + strengths + improvements)
-//   MOCK_NO_IMPROVEMENTS → score + strengths only
-//   MOCK_NO_STRENGTHS    → score + improvements only
-//   MOCK_NO_FEEDBACK     → score only, both lists empty
-//   null                 → invalid / unreadable resume
-
-const MOCK_VALID: ResumeAnalysis = {
-  valid: true,
-  ats_score: 72,
-  strengths: [
-    'Clear section formatting and consistent layout',
-    'Strong keyword density for a tech role',
-    'Relevant skills are well-listed and easy to scan',
-    'Education section is complete with degree and institution',
-  ],
-  improvements: [
-    'Add a professional summary at the top',
-    'Quantify achievements with numbers and metrics',
-    'Include a LinkedIn or GitHub URL',
-    'Use stronger action verbs (e.g. "Built" instead of "Worked on")',
-  ],
-}
-
-const MOCK_NO_IMPROVEMENTS: ResumeAnalysis = {
-  valid: true,
-  ats_score: 85,
-  strengths: [
-    'Excellent formatting and ATS-friendly structure',
-    'Strong quantified achievements throughout',
-    'Relevant keywords well distributed',
-  ],
-  improvements: [],
-}
-
-const MOCK_NO_STRENGTHS: ResumeAnalysis = {
-  valid: true,
-  ats_score: 38,
-  strengths: [],
-  improvements: [
-    'Add a professional summary at the top',
-    'Include contact information (email, phone, LinkedIn)',
-    'Add measurable achievements instead of vague descriptions',
-    'Use standard section headings for ATS compatibility',
-  ],
-}
-
-const MOCK_NO_FEEDBACK: ResumeAnalysis = {
-  valid: true,
-  ats_score: 61,
-  strengths: [],
-  improvements: [],
-}
-
-const MOCK_INVALID: ResumeAnalysis = {
-  valid: false,
-  ats_score: 0,
-  strengths: [],
-  improvements: [],
-}
-
-// ← change this to test different states
-// MOCK_VALID | MOCK_NO_IMPROVEMENTS | MOCK_NO_STRENGTHS | MOCK_NO_FEEDBACK | MOCK_INVALID
-const ACTIVE_MOCK: ResumeAnalysis = MOCK_VALID
 
 const ITEMS_PER_PAGE = 5
 
@@ -144,13 +79,19 @@ export default function DashboardPage() {
   }
 
   const handleAnalyze = async () => {
+    if (!file) return
     setStage('analyzing')
     setAnalysisError(null)
-    await new Promise(resolve => setTimeout(resolve, 2500))
-    if (!ACTIVE_MOCK.valid) {
-      setAnalysisError('No resume content detected. This PDF appears to be blank or does not contain valid resume content. Please upload a different file.')
-    } else {
-      setAnalysis(ACTIVE_MOCK)
+    try {
+      const result = await resumeApi.uploadResume(file)
+      if (!result.valid) {
+        setAnalysisError('No resume content detected. This PDF appears to be blank or does not contain valid resume content. Please upload a different file.')
+      } else {
+        setAnalysis(result)
+      }
+    } catch (err: unknown) {
+      const message = (err as any)?.data?.error
+      setAnalysisError(message || 'Failed to analyze resume. Please try again.')
     }
     setStage('results')
   }
