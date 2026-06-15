@@ -1,22 +1,12 @@
-import { Request, Response } from 'express'
-import jwt from 'jsonwebtoken'
-import { middleware } from '@/utils/helpers/middleware'
-import { COOKIE_NAME } from '@/utils/constants/common.constants'
-import { JWTPayload } from '@/utils/types/auth.types'
+import { Request, Response, NextFunction } from 'express'
+import passport from 'passport'
 import StatusError from '@/utils/helpers/statusError'
-import envs from '@/config/env'
+import { JWTPayload } from '@/utils/types/auth.types'
 
-const JWTUserCookie = middleware(async (req: Request, res: Response) => {
-    const token = req.cookies[COOKIE_NAME]
-
-    if (!token) {
-        throw StatusError.unauthorized('Not authenticated')
-    }
-
-    const payload = jwt.verify(token, envs.secret_key) as JWTPayload
-    req.user = payload as any
-})
-
-const authMiddlewares = { JWTUserCookie }
-
-export default authMiddlewares
+export const jwtAuth = (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate('jwt', { session: false }, (err: Error | null, user: JWTPayload | false) => {
+        if (err || !user) return next(StatusError.unauthorized('Not authenticated'))
+        req.user = user as any
+        next()
+    })(req, res, next)
+}

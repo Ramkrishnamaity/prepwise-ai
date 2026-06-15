@@ -50,6 +50,12 @@ const upload = controller(async (req: Request, res: Response) => {
     })
 })
 
-const resumeController = { upload }
+const getPastAnalyses = controller(async (req: Request, res: Response) => {
+    const userId = (req.user as unknown as JWTPayload).sub
+    const data = await resumeService.getPastAnalyses(userId)
+    res.status(200).json({ status: true, data })
+})
+
+const resumeController = { upload, getPastAnalyses }
 
 export default resumeController

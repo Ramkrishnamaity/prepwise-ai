@@ -1,5 +1,6 @@
 import { PDFParse } from 'pdf-parse'
 import mammoth from 'mammoth'
+import mongoose from 'mongoose'
 import Resume from '@/models/resume.model'
 import { IResume } from '@/utils/types/model.types'
 
@@ -29,10 +30,43 @@ const saveAnalysis = async (input: SaveAnalysisInput): Promise<IResume> => {
     return Resume.create(input)
 }
 
-const getAnalysesByUser = async (userId: string): Promise<IResume[]> => {
-    return Resume.find({ userId }).sort({ created_at: -1 })
+const getAnalysesByUser = async (userId: string) => {
+    return Resume.aggregate([
+        { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+        { $sort:  { created_at: -1 } },
+    ])
 }
 
-const resumeService = { extractText, saveAnalysis, getAnalysesByUser }
+const getPastAnalyses = async (userId: string) => {
+    return Resume.aggregate([
+        { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+        { $sort:  { created_at: -1 } },
+        { $project: {
+            valid:        1,
+            ats_score:    1,
+            strengths:    1,
+            improvements: 1,
+            created_at:   1,
+        }},
+        { $lookup: {
+            from:         'interviews',
+            localField:   '_id',
+            foreignField: 'resumeId',
+            pipeline: [
+                { $project: {
+                    scores:       1,
+                    strengths:    1,
+                    improvements: 1,
+                    feedback:     1,
+                    status:       1,
+                    created_at:   1,
+                }},
+            ],
+            as: 'interviews',
+        }},
+    ])
+}
+
+const resumeService = { extractText, saveAnalysis, getAnalysesByUser, getPastAnalyses }
 
 export default resumeService

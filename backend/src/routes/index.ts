@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import passport from 'passport'
 import authController from '@/controllers/auth.controller'
-import authMiddlewares from '@/middlewares/auth.middleware'
+import { jwtAuth } from '@/middlewares/auth.middleware'
 import uploadMiddleware from '@/middlewares/upload.middleware'
 import resumeController from '@/controllers/resume.controller'
 
@@ -16,12 +16,11 @@ router.get(
     '/auth/google/callback',
     passport.authenticate('google', { session: false, failureRedirect: '/' }),
     authController.googleCallback
-
 )
 
 router.get(
     '/auth/me',
-    authMiddlewares.JWTUserCookie,
+    jwtAuth,
     authController.getMe
 )
 
@@ -30,10 +29,16 @@ router.post(
     authController.logout
 )
 
+router.get(
+    '/resume/past-analyses',
+    jwtAuth,
+    resumeController.getPastAnalyses
+)
+
 router.post(
     '/resume/upload',
     uploadMiddleware.single('resume'),
-    authMiddlewares.JWTUserCookie,
+    jwtAuth,
     resumeController.upload
 )
 

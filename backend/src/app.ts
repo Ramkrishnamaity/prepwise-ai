@@ -13,7 +13,7 @@ import swaggerDocument from '@/swagger'
 import envs from '@/config/env'
 import initializePassport from '@/passport'
 import errorHandler from '@/utils/helpers/errorHandler'
-import authMiddlewares from '@/middlewares/auth.middleware'
+import { jwtAuth } from '@/middlewares/auth.middleware'
 import StatusError from '@/utils/helpers/statusError'
 
 const app = express()
@@ -21,7 +21,9 @@ const app = express()
 app.set('trust proxy', 1)
 
 // Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+    swaggerOptions: { withCredentials: true },
+}))
 
 // Security headers
 app.use(
@@ -84,7 +86,7 @@ initializePassport(passport)
 app.use(passport.initialize())
 
 // Serve public folder (protected — JWT required)
-app.use('/public', authMiddlewares.JWTUserCookie, express.static(path.resolve('./public')))
+app.use('/public', jwtAuth, express.static(path.resolve('./public')))
 
 // Routes
 app.use('/api/v1', rootRoutes)

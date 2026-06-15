@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { BrainCircuit, LogOut } from 'lucide-react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -12,6 +12,7 @@ import ThemeToggle from '@/components/ui/ThemeToggle'
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false)
+    const menuRef                 = useRef<HTMLDivElement>(null)
     const dispatch                = useDispatch()
     const { user, isLoggedIn }    = useSelector((state: RootState) => state.user)
 
@@ -19,6 +20,16 @@ export default function Navbar() {
         const onScroll = () => setScrolled(window.scrollY > 20)
         window.addEventListener('scroll', onScroll)
         return () => window.removeEventListener('scroll', onScroll)
+    }, [])
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setMenuOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
     const handleLogout = async () => {
@@ -48,12 +59,12 @@ export default function Navbar() {
                         <ThemeToggle />
 
                         {isLoggedIn && user && (
-                            <div
-                                className="relative"
-                                onMouseEnter={() => setMenuOpen(true)}
-                                onMouseLeave={() => setMenuOpen(false)}
-                            >
-                                <button className="flex items-center cursor-pointer focus:outline-none" aria-label="Account menu">
+                            <div ref={menuRef} className="relative">
+                                <button
+                                    onClick={() => setMenuOpen(prev => !prev)}
+                                    className="flex items-center cursor-pointer focus:outline-none"
+                                    aria-label="Account menu"
+                                >
                                     {user.picture ? (
                                         <img
                                             src={user.picture}
@@ -69,7 +80,7 @@ export default function Navbar() {
                                 </button>
 
                                 {menuOpen && (
-                                    <div className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-surface shadow-xl py-1">
+                                    <div className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-surface shadow-xl py-1 overflow-hidden">
                                         <div className="px-4 py-3 border-b border-border">
                                             <p className="text-sm font-medium text-text-primary truncate">{user.name}</p>
                                             <p className="text-xs text-text-muted truncate mt-0.5">{user.email}</p>

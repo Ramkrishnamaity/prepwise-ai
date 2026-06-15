@@ -1,10 +1,13 @@
 import { PassportStatic } from 'passport'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt'
 import envs from '@/config/env'
 import authService from '@/services/auth.service'
+import { COOKIE_NAME } from '@/utils/constants/common.constants'
+import { JWTPayload } from '@/utils/types/auth.types'
 
-const initializePassport = (passport: PassportStatic) => {
-    passport.use(
+const initializePassport = (passportInstance: PassportStatic) => {
+    passportInstance.use(
         new GoogleStrategy(
             {
                 clientID:     envs.google_client_id,
@@ -19,6 +22,20 @@ const initializePassport = (passport: PassportStatic) => {
                     return done(err as Error)
                 }
             }
+        )
+    )
+
+    passportInstance.use(
+        'jwt',
+        new JwtStrategy(
+            {
+                jwtFromRequest: ExtractJwt.fromExtractors([
+                    (req) => req?.cookies?.[COOKIE_NAME] ?? null,
+                    ExtractJwt.fromAuthHeaderAsBearerToken(),
+                ]),
+                secretOrKey: envs.secret_key,
+            },
+            (payload: JWTPayload, done) => done(null, payload)
         )
     )
 }

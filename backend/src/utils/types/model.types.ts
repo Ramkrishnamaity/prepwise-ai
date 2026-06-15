@@ -22,3 +22,21 @@ export interface IResume extends Document {
     updated_at:    Date
 }
 
+export interface IInterviewScores {
+    overAll:       number
+    communication: number
+    technical:     number
+}
+
+export interface IInterview extends Document {
+    userId:       mongoose.Types.ObjectId
+    resumeId:     mongoose.Types.ObjectId
+    scores:       IInterviewScores
+    strengths:    string[]
+    improvements: string[]
+    feedback:     string
+    status:       0 | 1 | 2 | 3
+    created_at:   Date
+    updated_at:   Date
+}
+
