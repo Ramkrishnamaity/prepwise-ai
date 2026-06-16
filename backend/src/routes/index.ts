@@ -4,8 +4,14 @@ import authController from '@/controllers/auth.controller'
 import { jwtAuth } from '@/middlewares/auth.middleware'
 import uploadMiddleware from '@/middlewares/upload.middleware'
 import resumeController from '@/controllers/resume.controller'
+import seedInterviews from '../../seed/interviews'
 
 const router = Router()
+
+router.get('/dev/seed/interviews', async (req, res) => {
+    await seedInterviews()
+    res.json({ status: true, message: 'Interviews seeded' })
+})
 
 router.get(
     '/auth/google',

@@ -79,6 +79,28 @@ const swaggerDocument = {
         },
     },
     paths: {
+        '/dev/seed/interviews': {
+            get: {
+                tags:    ['Dev'],
+                summary: 'Seed dummy interview documents into the database (dev only)',
+                responses: {
+                    200: {
+                        description: 'Interviews seeded successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        status:  { type: 'boolean', example: true },
+                                        message: { type: 'string', example: 'Interviews seeded' },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         '/resume/upload': {
             post: {
                 tags:     ['Resume'],
