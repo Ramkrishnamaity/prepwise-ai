@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { FileText, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import resumeApi from '@/services/api/resume.api'
 import type { PastAnalysis } from '@/types/analysis'
 import ResumeAnalysisCard from './ResumeAnalysisCard'
@@ -13,6 +14,7 @@ export default function PastAnalysisList() {
     const [loading,     setLoading]     = useState(true)
     const [loadingMore, setLoadingMore] = useState(false)
     const [error,       setError]       = useState<string | null>(null)
+    const [deletingId,  setDeletingId]  = useState<string | null>(null)
     const sentinelRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -44,6 +46,19 @@ export default function PastAnalysisList() {
         return () => observer.disconnect()
     }, [page, totalPages, loadingMore])
 
+    const handleDelete = async (id: string) => {
+        setDeletingId(id)
+        try {
+            await resumeApi.deleteResume(id)
+            setData(prev => prev.filter(a => a._id !== id))
+            toast.success('Analysis deleted')
+        } catch {
+            toast.error('Failed to delete. Please try again.')
+        } finally {
+            setDeletingId(null)
+        }
+    }
+
     if (loading) return (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -67,7 +82,13 @@ export default function PastAnalysisList() {
     return (
         <div className="flex flex-col gap-3">
             {data.map((analysis, i) => (
-                <ResumeAnalysisCard key={analysis._id} analysis={analysis} index={i} />
+                <ResumeAnalysisCard
+                    key={analysis._id}
+                    analysis={analysis}
+                    index={i}
+                    onDelete={handleDelete}
+                    deleting={deletingId === analysis._id}
+                />
             ))}
 
             {page < totalPages && <div ref={sentinelRef} />}

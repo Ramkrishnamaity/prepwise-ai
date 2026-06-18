@@ -62,6 +62,14 @@ const getPastAnalyses = controller(async (req: Request, res: Response) => {
     })
 })
 
-const resumeController = { upload, getPastAnalyses }
+const deleteResume = controller(async (req: Request, res: Response) => {
+    const userId  = (req.user as unknown as JWTPayload).sub
+    const id      = req.params.id as string
+    const deleted = await resumeService.deleteResume(id, userId)
+    if (!deleted) throw StatusError.notFound('Resume not found')
+    res.status(200).json({ status: true })
+})
+
+const resumeController = { upload, getPastAnalyses, deleteResume }
 
 export default resumeController

@@ -41,6 +41,12 @@ router.get(
     resumeController.getPastAnalyses
 )
 
+router.delete(
+    '/resume/:id',
+    jwtAuth,
+    resumeController.deleteResume
+)
+
 router.post(
     '/resume/upload',
     uploadMiddleware.single('resume'),

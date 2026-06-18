@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { Toaster } from 'sonner'
 import { Providers } from './providers'
 import './globals.css'
 
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-background text-text-primary antialiased">
         <Providers>{children}</Providers>
+        <Toaster position="bottom-center" richColors />
       </body>
     </html>
   )

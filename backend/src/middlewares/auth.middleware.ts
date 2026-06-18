@@ -4,7 +4,6 @@ import StatusError from '@/utils/helpers/statusError'
 import { JWTPayload } from '@/utils/types/auth.types'
 
 export const jwtAuth = (req: Request, res: Response, next: NextFunction) => {
-    console.log('JWT Auth Middleware Invoked', req.cookies)
     passport.authenticate('jwt', { session: false }, (err: Error | null, user: JWTPayload | false) => {
         if (err || !user) return next(StatusError.unauthorized('Not authenticated'))
         req.user = user as any

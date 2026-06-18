@@ -33,6 +33,10 @@ const getPastAnalyses = async (page = 1, limit = 5): Promise<PaginatedAnalysisRe
     return { data: data.data, pagination: data.pagination }
 }
 
-const resumeApi = { uploadResume, getPastAnalyses }
+const deleteResume = async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/resume/${id}`)
+}
+
+const resumeApi = { uploadResume, getPastAnalyses, deleteResume }
 
 export default resumeApi

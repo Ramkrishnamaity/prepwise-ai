@@ -77,6 +77,14 @@ const getPastAnalyses = async (userId: string, page: number, limit: number) => {
     return { data: result[0]?.data ?? [], total }
 }
 
-const resumeService = { extractText, saveAnalysis, getAnalysesByUser, getPastAnalyses }
+const deleteResume = async (resumeId: string, userId: string): Promise<boolean> => {
+    const result = await Resume.deleteOne({
+        _id:    new mongoose.Types.ObjectId(resumeId),
+        userId: new mongoose.Types.ObjectId(userId),
+    })
+    return result.deletedCount > 0
+}
+
+const resumeService = { extractText, saveAnalysis, getAnalysesByUser, getPastAnalyses, deleteResume }
 
 export default resumeService
