@@ -1,5 +1,6 @@
 import axiosInstance from './index'
 import type { ResumeAnalysis } from '@/types/resume'
+import type { PastAnalysis, PaginatedAnalysisResponse } from '@/types/analysis'
 
 interface UploadResumeResponse {
     status: boolean
@@ -25,6 +26,13 @@ const uploadResume = async (file: File): Promise<ResumeAnalysis> => {
     return { valid, ats_score, strengths, improvements }
 }
 
-const resumeApi = { uploadResume }
+const getPastAnalyses = async (page = 1, limit = 5): Promise<PaginatedAnalysisResponse> => {
+    const { data } = await axiosInstance.get<{ status: boolean } & PaginatedAnalysisResponse>(
+        `/resume/past-analyses?page=${page}&limit=${limit}`
+    )
+    return { data: data.data, pagination: data.pagination }
+}
+
+const resumeApi = { uploadResume, getPastAnalyses }
 
 export default resumeApi

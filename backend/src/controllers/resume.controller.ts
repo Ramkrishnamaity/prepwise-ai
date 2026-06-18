@@ -52,8 +52,14 @@ const upload = controller(async (req: Request, res: Response) => {
 
 const getPastAnalyses = controller(async (req: Request, res: Response) => {
     const userId = (req.user as unknown as JWTPayload).sub
-    const data = await resumeService.getPastAnalyses(userId)
-    res.status(200).json({ status: true, data })
+    const page  = Math.max(1, parseInt(req.query.page  as string) || 1)
+    const limit = Math.max(1, parseInt(req.query.limit as string) || 5)
+    const { data, total } = await resumeService.getPastAnalyses(userId, page, limit)
+    res.status(200).json({
+        status: true,
+        data,
+        pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    })
 })
 
 const resumeController = { upload, getPastAnalyses }

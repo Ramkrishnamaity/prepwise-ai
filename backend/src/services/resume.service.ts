@@ -37,34 +37,44 @@ const getAnalysesByUser = async (userId: string) => {
     ])
 }
 
-const getPastAnalyses = async (userId: string) => {
-    return Resume.aggregate([
+const getPastAnalyses = async (userId: string, page: number, limit: number) => {
+    const skip = (page - 1) * limit
+    const result = await Resume.aggregate([
         { $match: { userId: new mongoose.Types.ObjectId(userId) } },
         { $sort:  { created_at: -1 } },
-        { $project: {
-            valid:        1,
-            ats_score:    1,
-            strengths:    1,
-            improvements: 1,
-            created_at:   1,
-        }},
-        { $lookup: {
-            from:         'interviews',
-            localField:   '_id',
-            foreignField: 'resumeId',
-            pipeline: [
+        { $facet: {
+            data: [
+                { $skip:  skip },
+                { $limit: limit },
                 { $project: {
-                    scores:       1,
+                    valid:        1,
+                    ats_score:    1,
                     strengths:    1,
                     improvements: 1,
-                    feedback:     1,
-                    status:       1,
                     created_at:   1,
                 }},
+                { $lookup: {
+                    from:         'interviews',
+                    localField:   '_id',
+                    foreignField: 'resumeId',
+                    pipeline: [
+                        { $project: {
+                            scores:       1,
+                            strengths:    1,
+                            improvements: 1,
+                            feedback:     1,
+                            status:       1,
+                            created_at:   1,
+                        }},
+                    ],
+                    as: 'interviews',
+                }},
             ],
-            as: 'interviews',
+            totalCount: [{ $count: 'count' }],
         }},
     ])
+    const total = (result[0]?.totalCount[0]?.count as number) ?? 0
+    return { data: result[0]?.data ?? [], total }
 }
 
 const resumeService = { extractText, saveAnalysis, getAnalysesByUser, getPastAnalyses }
