@@ -1,7 +1,10 @@
-export default function InterviewPage() {
-    return (
-        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-            <h1 className="text-2xl font-semibold text-text-primary">Interview</h1>
-        </div>
-    )
+import { InterviewRoom } from '@/components/interview/InterviewRoom'
+
+interface PageProps {
+  params: Promise<{ id: string }>
+}
+
+export default async function InterviewPage({ params }: PageProps) {
+  const { id } = await params
+  return <InterviewRoom resumeId={id} />
 }
